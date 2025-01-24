@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom API Tool</title>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-subject-line-generator {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: block;
+            text-align: left;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .generate-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .generate-button:hover {
+            background-color: #45a049;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .output-area {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            margin-top: 10px;
+            height: 150px;
+            resize: none;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .output-area:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-subject-line-generator">
+        <h2>Email Subject Line Generator</h2>
+        <label for="categoryInput">Enter Email Category:</label>
+        <input type="text" id="categoryInput" placeholder="e.g., Funny Subject Lines" class="input-field"/>
+        <button id="generateButton" class="generate-button">Generate</button>
+        
+        <h3>Generated Subject Lines:</h3>
+        <textarea id="apiResponse" rows="10" cols="50" readonly class="output-area"></textarea>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const generateButton = document.getElementById('generateButton');
+            const categoryInput = document.getElementById('categoryInput');
+            const apiResponse = document.getElementById('apiResponse');
+
+            generateButton.addEventListener('click', function () {
+                const category = categoryInput.value.trim();
+
+                if (!category) {
+                    apiResponse.value = 'Error: Please enter a category!';
+                    return;
+                }
+
+                // Define your WordPress custom API endpoint
+                const apiUrl = 'https://trial-wp.great-site.net/wp-admin/admin-ajax.php?action=fetch_data_v3&category=' + encodeURIComponent(category);
+
+                // Clear the textarea before fetching
+                apiResponse.value = 'Fetching data...';
+
+                // Send the GET request to your WordPress API endpoint
+                fetch(apiUrl, {
+                    method: 'GET',
+                })
+                    .then(response => {
+                        // Check if the response status is OK (200-299)
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json(); // Parse the response as JSON
+                    })
+                    .then(data => {
+                        // Display the API response data inside the textarea
+                        if (data.success) {
+                            apiResponse.value = JSON.stringify(data.data, null, 2);
+                        } else {
+                            apiResponse.value = `Error: ${data.error || 'No data returned from API'}`;
+                        }
+                    })
+                    .catch(error => {
+                        // Display any errors that occur during the fetch
+                        apiResponse.value = `Error: ${error.message}`;
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
