@@ -16,7 +16,7 @@
           "parameters": {
             "url": "The website URL (e.g., learnwithhasan.com)"
           },
-          "code": "function get_response_time(url) {\n  if (url === 'learnwithhasan.com') return 0.5;\n  if (url === 'google.com') return 0.3;\n  if (url === 'openai.com') return 0.4;\n  return 'Unknown URL';\n}"
+          "code": "function get_response_time(params) {\n  var url = params.url;\n  if (url === 'learnwithhasan.com') return 0.5;\n  if (url === 'google.com') return 0.3;\n  if (url === 'openai.com') return 0.4;\n  return 'Unknown URL';\n}"
         },
         {
           "name": "get_site_health",
@@ -24,7 +24,7 @@
           "parameters": {
             "url": "The website URL"
           },
-          "code": "function get_site_health(url) {\n  var rt = get_response_time(url);\n  if (rt === 'Unknown URL') return 'Cannot evaluate health for ' + url + ' - domain not recognized.';\n  if (rt < 0.4) return '✅ ' + url + ' is healthy (response time: ' + rt + 's)';\n  else return '⚠️ ' + url + ' is slow (response time: ' + rt + 's)';\n}"
+          "code": "function get_site_health(params) {\n  var url = params.url;\n  var rt = get_response_time({url: url});\n  if (rt === 'Unknown URL') return 'Cannot evaluate health for ' + url + ' - domain not recognized.';\n  if (rt < 0.4) return '✅ ' + url + ' is healthy (response time: ' + rt + 's)';\n  else return '⚠️ ' + url + ' is slow (response time: ' + rt + 's)';\n}"
         }
       ]
     },
@@ -38,7 +38,7 @@
             "endpoint": "The full URL or relative path",
             "base_key": "Optional: which web_resource to use as base (e.g., 'json_placeholder')"
           },
-          "code": "function fetch_json(params) {\n  var endpoint = params.endpoint;\n  var base_key = params.base_key;\n  var url = endpoint;\n  var bases = {\n    'json_placeholder': 'https://jsonplaceholder.typicode.com',\n    'httpbin': 'https://httpbin.org',\n    'time_api': 'https://worldtimeapi.org/api'\n  };\n  if (base_key && bases[base_key]) {\n    url = bases[base_key] + endpoint;\n  }\n  try {\n    var resp = UrlFetchApp.fetch(url);\n    return JSON.parse(resp.getContentText());\n  } catch(e) {\n    return { error: e.toString() };\n  }\n}"
+          "code": "function fetch_json(params) {\n  var endpoint = params.endpoint;\n  var base_key = params.base_key || null;\n  var url = endpoint;\n  var bases = {\n    'json_placeholder': 'https://jsonplaceholder.typicode.com',\n    'httpbin': 'https://httpbin.org',\n    'time_api': 'https://worldtimeapi.org/api'\n  };\n  if (base_key && bases[base_key]) {\n    url = bases[base_key] + endpoint;\n  }\n  try {\n    var resp = UrlFetchApp.fetch(url);\n    return JSON.parse(resp.getContentText());\n  } catch(e) {\n    return { error: e.toString() };\n  }\n}"
         },
         {
           "name": "fetch_and_process_user",
